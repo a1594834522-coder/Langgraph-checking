@@ -16,10 +16,15 @@
 6. **报告生成** - HTML格式化输出
 
 ## 安装说明
-1.创建虚拟环境 python -m venv venv
-启用   .venv/Scripts/activate
+1.创建虚拟环境 python -m venv venv 
+
+启用   .venv/Scripts/activate    
+
 2.安装依赖 pip install .
+
 pip install requirements.txt
+
 3.打开开发工具 langgraph dev
 
+4.启动网页端 python web_app_v2.py
 
