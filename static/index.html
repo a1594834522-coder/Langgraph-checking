@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph 职称评审材料审核系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- 头部导航 -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <i class="bi bi-file-check-fill me-2"></i>
+                    LangGraph 职称评审系统
+                </a>
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="/docs" target="_blank">
+                        <i class="bi bi-book me-1"></i>API文档
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mt-4">
+            <div class="row">
+                <!-- 左侧上传区域 -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-cloud-upload me-2"></i>文件上传
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="uploadForm" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="fileInput" class="form-label">选择文件</label>
+                                    <input type="file" class="form-control" id="fileInput" accept=".zip,.pdf" required>
+                                    <div class="form-text">支持ZIP文件（完整材料包）或PDF文件（单个文档）</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="sessionId" class="form-label">会话ID（可选）</label>
+                                    <input type="text" class="form-control" id="sessionId" placeholder="自动生成">
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="withTracing">
+                                        <label class="form-check-label" for="withTracing">
+                                            启用LangSmith追踪
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="debugMode">
+                                        <label class="form-check-label" for="debugMode">
+                                            启用调试模式
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="streamMode" class="form-label">流式模式</label>
+                                    <select class="form-select" id="streamMode">
+                                        <option value="updates">Updates - 状态更新</option>
+                                        <option value="events">Events - 所有事件</option>
+                                        <option value="custom">Custom - 自定义数据</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100" id="uploadBtn">
+                                    <i class="bi bi-upload me-2"></i>开始审核
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- 任务列表 -->
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-list-task me-2"></i>任务列表
+                            </h5>
+                            <button class="btn btn-sm btn-outline-primary" id="refreshTasks">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="taskList" class="list-group list-group-flush">
+                                <!-- 任务项将在这里动态加载 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧主要内容区域 -->
+                <div class="col-lg-8">
+                    <!-- 欢迎界面 -->
+                    <div id="welcomeScreen" class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="bi bi-file-earmark-check display-1 text-primary"></i>
+                        </div>
+                        <h2>LangGraph 职称评审材料审核系统</h2>
+                        <p class="text-muted lead">
+                            基于人工智能的智能职称材料审核，支持实时流式处理和进度追踪
+                        </p>
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="feature-card">
+                                    <i class="bi bi-lightning-charge text-warning"></i>
+                                    <h5>智能处理</h5>
+                                    <p>AI驱动的内容提取和规则验证</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="feature-card">
+                                    <i class="bi bi-broadcast text-success"></i>
+                                    <h5>实时更新</h5>
+                                    <p>流式API支持实时进度追踪</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="feature-card">
+                                    <i class="bi bi-file-earmark-text text-info"></i>
+                                    <h5>详细报告</h5>
+                                    <p>生成完整的HTML审核报告</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 审核进度界面 -->
+                    <div id="auditScreen" class="d-none">
+                        <!-- 文件信息卡片 -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-info-circle me-2"></i>审核信息
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>任务ID:</strong> <span id="currentTaskId"></span><br>
+                                        <strong>文件名:</strong> <span id="currentFileName"></span><br>
+                                        <strong>文件大小:</strong> <span id="currentFileSize"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>会话ID:</strong> <span id="currentSessionId"></span><br>
+                                        <strong>开始时间:</strong> <span id="currentStartTime"></span><br>
+                                        <strong>状态:</strong> <span id="currentStatus" class="badge"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 进度条 -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="fw-bold">审核进度</span>
+                                    <span id="progressPercent">0%</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 10px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                         id="progressBar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <div id="progressDescription" class="text-muted">准备开始...</div>
+                            </div>
+                        </div>
+
+                        <!-- 工作流步骤 -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-diagram-2 me-2"></i>工作流步骤
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="workflowSteps">
+                                    <!-- 步骤将在这里动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 实时日志 -->
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-terminal me-2"></i>实时日志
+                                </h5>
+                                <button class="btn btn-sm btn-outline-secondary" id="clearLogs">
+                                    <i class="bi bi-trash"></i>清空
+                                </button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="logContainer" class="log-container">
+                                    <!-- 日志将在这里显示 -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 操作按钮 -->
+                        <div class="d-flex gap-2 mb-4">
+                            <button class="btn btn-success" id="downloadReport" disabled>
+                                <i class="bi bi-download me-2"></i>下载报告
+                            </button>
+                            <button class="btn btn-outline-secondary" id="viewDetails" disabled>
+                                <i class="bi bi-eye me-2"></i>查看详情
+                            </button>
+                            <button class="btn btn-outline-danger" id="cancelTask" disabled>
+                                <i class="bi bi-x-circle me-2"></i>取消任务
+                            </button>
+                            <button class="btn btn-outline-primary" id="newTask">
+                                <i class="bi bi-plus-circle me-2"></i>新建任务
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态对话框 -->
+    <div class="modal fade" id="detailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">任务详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <pre id="taskDetails" class="bg-light p-3 rounded"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 错误提示模态框 -->
+    <div class="modal fade" id="errorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle me-2"></i>错误
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "langgraph-audit-system"
+version = "0.1.0"
+description = "An enterprise-level intelligent title evaluation material review system built on the LangGraph framework"
+authors = [
+    {name = "LangGraph Audit Team", email = "team@langgraph-audit.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+keywords = ["langgraph", "audit", "ai", "workflow", "title-evaluation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Core dependencies for production
+dependencies = [
+    # LangGraph core dependencies
+    "langgraph>=0.2.0",
+    "langsmith>=0.1.0",
+    "langtrace-python-sdk>=2.0.0",
+    "pydantic>=2.0.0",
+    "typing-extensions>=4.0.0",
+    "langchain-core>=0.1.0",  # LangGraph core dependency
+    "langgraph-cli>=0.1.0",  # LangGraph development tools
+    
+    # LangGraph Redis integration
+    "langgraph-checkpoint-redis>=0.1.0",
+    
+    # PostgreSQL integration
+    "psycopg[binary,pool]>=3.1.0",
+    "asyncpg>=0.29.0",
+    
+    # AI API integration
+    "google-generativeai>=0.3.0",
+    
+    # Environment and configuration
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+    
+    # File processing utilities
+    "pathlib2",
+    "zipfile36>=0.1.0",
+    "python-magic>=0.4.0",
+    "Pillow>=10.0.0",
+    
+    # Web framework
+    "fastapi>=0.104.0",
+    "uvicorn>=0.24.0",
+    "python-multipart>=0.0.6",
+    "sse-starlette>=1.6.0",  # Server-Sent Events support
+    "starlette>=0.27.0",
+    
+    # Data processing
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    
+    # HTML report generation
+    "jinja2>=3.1.0",
+    "weasyprint>=60.0",
+    
+    # Monitoring and logging
+    "loguru>=0.7.0",
+    "prometheus-client>=0.19.0",
+    
+    # OCR and computer vision
+    "pytesseract>=0.3.10",
+    "opencv-python>=4.8.0",
+    
+    # Database support
+    "sqlalchemy>=2.0.0",
+    "alembic>=1.12.0",
+    
+    # Async processing
+    "aiofiles>=23.2.0",
+    "aiohttp>=3.8.0",
+    "celery>=5.3.0",
+    "redis>=5.0.0",
+    
+    # Document processing
+    "markdown>=3.5.0",
+    "markdownify>=0.11.0",
+]
+
+[project.optional-dependencies]
+# Development dependencies
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.6.0",
+]
+
+# Testing dependencies
+test = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.11.0",
+    "httpx>=0.25.0",  # for testing FastAPI endpoints
+]
+
+# Documentation dependencies
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.4.0",
+    "mkdocstrings[python]>=0.23.0",
+]
+
+# Full development environment
+all = [
+    "langgraph-audit-system[dev,test,docs]"
+]
+
+[project.urls]
+Homepage = "https://github.com/your-org/langgraph-audit-system"
+Documentation = "https://your-org.github.io/langgraph-audit-system"
+Repository = "https://github.com/your-org/langgraph-audit-system.git"
+Issues = "https://github.com/your-org/langgraph-audit-system/issues"
+
+[project.scripts]
+# Command line entry points
+langgraph-audit = "src.agent:main"
+audit-debug = "debug_langsmith:main"
+check-health = "check_health:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/",
+    "rules/",
+    "test_data/",
+    "README.md",
+    "langgraph.json",
+    "pyproject.toml",
+]
+exclude = [
+    "**/__pycache__/",
+    "**/*.pyc",
+    "**/*.pyo",
+    "**/*.orig",
+    "**/*.rej",
+    "**/*~",
+    "**/#*#",
+    "**/.#*",
+    ".git/",
+    ".pytest_cache/",
+    ".coverage",
+]
+
+# Black code formatting configuration
+[tool.black]
+line-length = 88
+target-version = ["py310", "py311", "py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+# isort import sorting configuration
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["src"]
+known_third_party = ["langgraph", "langsmith", "pydantic", "fastapi"]
+
+# Flake8 linting configuration
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503", "E501"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".eggs",
+    "*.egg-info",
+    ".venv",
+    ".pytest_cache",
+]
+
+# MyPy type checking configuration
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pytesseract",
+    "cv2",
+    "weasyprint",
+    "celery",
+    "redis",
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "langsmith: marks tests that require LangSmith API",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+]
+
+[tool.coverage.report]
+precision = 2
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

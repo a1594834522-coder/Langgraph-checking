@@ -1,0 +1,76 @@
+# 基础依赖包
+langgraph>=0.2.0
+langsmith>=0.1.0
+langtrace-python-sdk>=2.0.0
+pydantic>=2.0.0
+typing-extensions>=4.0.0
+langchain-core>=0.1.0  # LangGraph核心依赖
+langgraph-cli>=0.1.0  # LangGraph开发工具
+langgraph-checkpoint-redis>=0.1.0  # Redis检查点
+
+# 谷歌AI API（新版本）
+google-genai>=1.33.0
+
+# 环境变量管理
+python-dotenv>=1.0.0
+
+# 文件处理
+pathlib2
+zipfile36>=0.1.0
+python-magic>=0.4.0
+Pillow>=10.0.0
+
+# Web框架
+fastapi>=0.104.0
+uvicorn>=0.24.0
+python-multipart>=0.0.6
+sse-starlette>=1.6.0  # Server-Sent Events支持
+starlette>=0.27.0
+
+# 数据处理
+pandas>=2.0.0
+numpy>=1.24.0
+
+# HTML报告生成
+jinja2>=3.1.0
+weasyprint>=60.0
+
+# 配置管理
+python-dotenv>=1.0.0
+pyyaml>=6.0
+
+# 日志和监控
+loguru>=0.7.0
+prometheus-client>=0.19.0
+
+# 测试框架
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+
+# 开发工具
+black>=23.0.0
+isort>=5.12.0
+flake8>=6.0.0
+mypy>=1.6.0
+
+# OCR和AI
+pytesseract>=0.3.10
+opencv-python>=4.8.0
+
+# 数据库
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+
+# 异步处理
+aiofiles>=23.2.0
+celery>=5.3.0
+redis>=5.0.0
+
+# 文档处理
+markdown>=3.5.0
+markdownify>=0.11.0
+
+# 工作流状态管理
+psycopg>=3.1.0  # PostgreSQL支持
+asyncpg>=0.29.0  # 异步PostgreSQL

@@ -1,0 +1,10 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "audit_workflow": "graph_def:graph"
+  },
+  "dockerfile_lines": [],
+  "python_version": "3.12",
+  "env": ".env",
+  "port": 8123
+}

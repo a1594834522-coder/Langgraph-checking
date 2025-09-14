@@ -1,0 +1,59 @@
+# Python bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+venv313/
+
+# Test caches & coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage*
+coverage.xml
+htmlcov/
+
+# Packaging / build artifacts
+build/
+dist/
+.eggs/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+logs/
+*.log
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment files
+.env
+!.env.example
+
+# Project-specific temporary/data dirs
+test_data/
+temp_pdf_processing/
+uploads/
+extracted/
+.model_cache/
+.langgraph_api/
+.qoder/
+
+# Optional: front-end deps if ever used
+node_modules/
+
